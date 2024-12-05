@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حاسبة حساب الأسياخ</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            text-align: center;
+            margin: 0;
+            padding: 30px;
+            direction: rtl; /* النصوص تبدأ من اليمين إلى اليسار */
+        }
+        .calculator {
+            display: inline-block;
+            background: #fff;
+            padding: 50px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            max-width: 700px; /* توسيع العرض */
+            margin: auto;
+        }
+        .input-group {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end; /* النصوص والتسميات تكون على اليمين */
+            margin: 10px 0;
+        }
+        label {
+            width: 120px; /* عرض ثابت للتسميات */
+            font-size: 14px;
+            text-align: right; /* النصوص داخل التسميات تكون يمين */
+        }
+        input, button {
+            width: 100px; /* حجم موحد لمربعات النص */
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center; /* النصوص داخل مربعات النص في المنتصف */
+        }
+        button {
+            width: calc(100% - 20px); /* زر بحجم كامل */
+            background: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        textarea {
+            width: calc(100% - 5px);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: none;
+            height: 150px;
+            text-align: right; /* النصوص داخل مربع النص F تكون في اليمين */
+            direction: rtl; /* الاتجاه داخل مربع النص F يكون عربيًا */
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h2>حاسبة حساب الأسياخ</h2>
+        <form id="calculatorForm">
+            <div class="input-group">
+                <label for="A">رقم البند</label>
+                <input type="number" id="A" placeholder="A" required>
+            </div>
+            <div class="input-group">
+                <label for="B">اقطر التسليح</label>
+                <input type="number" id="B" placeholder="B" required>
+            </div>
+            <div class="input-group">
+                <label for="C">عدد الأعضاء</label>
+                <input type="number" id="C" placeholder="C" required>
+            </div>
+            <div class="input-group">
+                <label for="D">عدد القطع في العضو الواحد</label>
+                <input type="number" id="D" placeholder="D" required>
+            </div>
+            <div class="input-group">
+                <label for="E">طول القطعة الواحدة</label>
+                <input type="number" id="E" placeholder="E" required>
+            </div>
+            <button type="button" onclick="calculate()">احسب</button>
+            <textarea id="F" readonly placeholder="النتيجة ستظهر هنا..."></textarea>
+        </form>
+    </div>
+
+    <script>
+        function calculate() {
+            const A = parseFloat(document.getElementById("A").value);
+            const B = parseFloat(document.getElementById("B").value);
+            const C = parseFloat(document.getElementById("C").value);
+            const D = parseFloat(document.getElementById("D").value);
+            const E = parseFloat(document.getElementById("E").value);
+            const F = document.getElementById("F");
+
+            if (isNaN(A) || isNaN(B) || isNaN(C) || isNaN(D) || isNaN(E)) {
+                F.value = "يرجى إدخال قيم صحيحة في جميع الحقول!";
+                return;
+            }
+
+            try {
+                // العمليات الحسابية
+                const countRebar12m = Math.ceil((C * D) / Math.floor(12 / E));
+                const totalLengthRebar12m = 12 * countRebar12m;
+                const totalLengthOffcut = (12 * countRebar12m) - (E * (C * D));
+                const length1Offcut = 12 - (E * Math.floor(12 / E));
+                const totalLengthTypicalOffcut = (countRebar12m - 1) * length1Offcut;
+                const lengthLastOffcut = totalLengthOffcut - totalLengthTypicalOffcut;
+
+                // تحديد النص بناءً على الشروط
+                let output = "";
+                if (totalLengthOffcut === 0) {
+                    output = "لا توجد قطع مهدورة";
+                } else if (totalLengthOffcut !== 0 && length1Offcut === lengthLastOffcut) {
+                    output = `عدد القطع المهدورة = ${countRebar12m} بطول = ${length1Offcut.toFixed(2)}`;
+                } else if (totalLengthOffcut !== 0 && length1Offcut === 0) {
+                    output = `الهدر في سيخة واحدة فقط وطوله = ${lengthLastOffcut.toFixed(2)}`;
+                } else if (totalLengthOffcut !== 0 && length1Offcut !== lengthLastOffcut) {
+                    output = `عدد القطع المهدورة = ${countRebar12m}، ${countRebar12m - 1} منها بطول = ${length1Offcut.toFixed(2)}، والهدر في السيخة الأخيرة = ${lengthLastOffcut.toFixed(2)}`;
+                }
+
+                // إخراج النتيجة
+                F.value = `1. عدد الأسياخ طول 12 متر = ${countRebar12m}\n2. ${output}`;
+            } catch (error) {
+                F.value = "حدث خطأ أثناء الحساب. يرجى التحقق من المدخلات.";
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
